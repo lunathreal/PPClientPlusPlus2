@@ -1621,7 +1621,7 @@ let uiMenu = $('<div id=realdrag>')
     uiMenu.append(Menu.preview)
 
 uiMenu.css({
-    'display': 'block',
+    'display': 'none',
     'position': 'absolute',
     'font-family': 'Monospace',
     'color': '#d9d2d2',
