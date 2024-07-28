@@ -1645,6 +1645,7 @@ elem.on('click', function () {
         }
     });
 });
+    buttons.append(elem)
 $('#select').change(function() {
     if ($(this).val() === '1') {
          Azti.order["left"]
@@ -1775,7 +1776,99 @@ document.addEventListener('keydown',function(e) {
       Azti.queue = [];
    }
 });
+    function moveAndShowRealdrag() {
+        const container = document.getElementById('container');
+        const realdrag = document.getElementById('realdrag');
 
+        if (container && realdrag) {
+            container.insertAdjacentElement('afterend', realdrag);
+
+        }
+    }
+
+    window.addEventListener('load', moveAndShowRealdrag);
+
+    const newButton = document.createElement('a');
+    newButton.href = "#";
+    newButton.title = "Bot Menu";
+    newButton.className = "grey margin-top-button rainbow-button";
+    const img = document.createElement('img');
+    img.src = "https://i.imgur.com/tLWE5SR.png";
+    img.alt = "icon";
+    newButton.appendChild(img);
+    const toggleRealDrag = () => {
+        const realDrag = document.getElementById('realdrag');
+        if (realDrag) {
+            if (realDrag.style.display === 'none' || realDrag.style.display === '') {
+                realDrag.style.display = 'block';
+            } else {
+                realDrag.style.display = 'none';
+            }
+        }
+    };
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes rainbow {
+            0% { background-color: red; }
+            14% { background-color: orange; }
+            28% { background-color: yellow; }
+            42% { background-color: green; }
+            57% { background-color: blue; }
+            71% { background-color: indigo; }
+            85% { background-color: violet; }
+            100% { background-color: red; }
+        }
+        .rainbow-button {
+            animation: rainbow 10s infinite;
+        }
+        .rainbow-button img {
+            display: block;
+            margin: 0 auto;
+        }
+    `;
+    document.head.appendChild(style);
+    newButton.addEventListener('click', (e) => {
+    $(uiMenu).toggle("slide", { direction: "left" }, 400);
+        e.preventDefault();
+        toggleRealDrag();
+    });
+    const insertButton = () => {
+        const container = document.getElementById('container');
+        if (container) {
+            const menuButtons = container.querySelector('#menu-buttons');
+            if (menuButtons) {
+                menuButtons.appendChild(newButton);
+            }
+        }
+    };
+    window.addEventListener('load', insertButton);
+    const realDragElement = document.querySelector('#realdrag');
+    let isDragging = false;
+    let initialX;
+    let initialY;
+
+    function handleMouseDown(event) {
+        isDragging = true;
+        initialX = event.clientX - realDragElement.getBoundingClientRect().left;
+        initialY = event.clientY - realDragElement.getBoundingClientRect().top;
+    }
+
+    function handleMouseMove(event) {
+        if (isDragging) {
+            const newX = event.clientX - initialX;
+            const newY = event.clientY - initialY;
+            realDragElement.style.left = newX + 'px';
+            realDragElement.style.top = newY + 'px';
+        }
+    }
+
+    function handleMouseUp() {
+        isDragging = false;
+    }
+
+    realDragElement.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
 })();
 document.getElementById('copyright').innerHTML = 'PPClient++ Public 1.0.1';
 // 0vC4#7152 aka Palette
