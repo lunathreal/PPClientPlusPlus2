@@ -1870,5 +1870,5 @@ document.addEventListener('keydown',function(e) {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
 })();
-document.getElementById('copyright').innerHTML = 'PPClient++ Public 1.0.1';
+document.getElementById('copyright').innerHTML = 'PPClient++ Public 1.0.2.1';
 // 0vC4#7152 aka Palette
