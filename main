@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PPClient++ 2
 // @description  Pixel Place Client
-// @version      1.0.3.1
+// @version      1.0.4
 // @author       0vC4 + Azti
 // @namespace    Hidden
 // @match        https://pixelplace.io/*
@@ -1534,7 +1534,8 @@ const Menu = {
     original: $('<p>'),
     restart: $('<button>').text('Restart Botting'),
     stop: $('<button>').text('Cancel Botting'),
-    togglebot: $('<button id=tglbot>').text('Toggle Bot [ON]')
+    togglebot: $('<button id=tglbot>').text('Toggle Bot [ON]'),
+    overlay: $('<button id="overlay">').text('Toggle Overlay')
 }
 
 $([Menu.preview[0]]).css({
@@ -1547,7 +1548,7 @@ $([Menu.preview[0]]).css({
     "margin": "5px"
 })
 
-$([Menu.togglebot[0], Menu.restart[0], Menu.title[0], Menu.stop[0], Menu.select[0],]).css({
+$([Menu.togglebot[0], Menu.restart[0], Menu.title[0], Menu.stop[0], Menu.select[0], Menu.overlay[0],]).css({
     "border": "2px rgb(8,8,8) solid",
     "background": "linear-gradient(90deg, rgba(30,30,30,1) 0%, rgba(34,34,34,1) 100%)",
     "border-radius": "0px",
@@ -1617,7 +1618,7 @@ let uiMenu = $('<div id=realdrag>')
                 })),
     Menu.original,
     $('<div>').append(Menu.togglebot),
-    $('<div>').append(Menu.restart, Menu.stop))
+    $('<div>').append(Menu.restart, Menu.stop, Menu.overlay))
     uiMenu.append(Menu.preview)
 
 uiMenu.css({
@@ -1869,8 +1870,239 @@ document.addEventListener('keydown',function(e) {
     realDragElement.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+
+    const overlay = document.createElement('img');
+    overlay.style.position = 'absolute';
+    overlay.style.top = '50px';
+    overlay.style.left = '50px';
+    overlay.style.zIndex = '9998';
+    overlay.style.cursor = 'move';
+    overlay.style.maxWidth = 'none';
+    overlay.style.imageRendering = 'pixelated';
+    overlay.draggable = false;
+    document.body.appendChild(overlay);
+
+    const uiBackground = document.createElement('div');
+    uiBackground.style.position = 'fixed';
+    uiBackground.style.top = '10px';
+    uiBackground.style.left = '10px';
+    uiBackground.style.zIndex = '9999';
+    uiBackground.style.padding = '12px';
+    uiBackground.style.width = '295px';
+    uiBackground.style.height = '205px';
+    uiBackground.style.background = 'rgba(34, 34, 34, 1)';
+    uiBackground.style.border = '2px solid rgb(0, 178, 225)';
+    uiBackground.style.color = 'white';
+    uiBackground.style.display = 'block';
+    document.body.appendChild(uiBackground);
+
+    const uiContainer = document.createElement('div');
+    uiContainer.style.position = 'fixed';
+    uiContainer.style.top = '16.5px';
+    uiContainer.style.left = '16.5px';
+    uiContainer.style.zIndex = '10000';
+    uiContainer.style.padding = '10px';
+    uiContainer.style.background = 'rgba(34, 34, 34, 0)';
+    uiContainer.style.borderRadius = '0px';
+    uiContainer.style.border = '2px solid rgb(8, 8, 8)';
+    uiContainer.style.color = 'white';
+    uiContainer.style.fontFamily = 'monospace';
+    uiContainer.style.fontSize = '14.4px';
+    uiContainer.style.display = 'block';
+    uiContainer.style.gap = '10px';
+    uiContainer.style.alignItems = 'center';
+    document.body.appendChild(uiContainer);
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.style.color = 'transparent';
+    input.style.width = '102px';
+    input.style.height = '28px';
+    input.style.padding = '5px';
+    input.style.background = 'white';
+    input.style.border = '2px solid rgb(8, 8, 8)';
+    input.style.borderRadius = '0px';
+    input.style.cursor = 'pointer';
+    input.style.fontFamily = 'monospace';
+    input.style.fontSize = '14.4px';
+    uiContainer.appendChild(input);
+
+    const scaleLabel = document.createElement('label');
+    scaleLabel.textContent = 'Scale:';
+    scaleLabel.style.marginLeft = '5px';
+    scaleLabel.style.marginRight = '5px';
+    scaleLabel.style.fontFamily = 'monospace';
+    scaleLabel.style.fontSize = '14.4px';
+    uiContainer.appendChild(scaleLabel);
+
+    const scaleInput = document.createElement('input');
+    scaleInput.type = 'number';
+    scaleInput.value = window.devicePixelRatio;
+    scaleInput.step = '0.1';
+    scaleInput.min = '0.1';
+    scaleInput.style.color = 'white';
+    scaleInput.style.width = '60px';
+    scaleInput.style.padding = '5px';
+    scaleInput.style.border = 'none';
+    scaleInput.style.background = '#222';
+    scaleInput.style.borderRadius = '0px';
+    scaleInput.style.textAlign = 'center';
+    scaleInput.style.border = '2px solid rgb(8, 8, 8)';
+    scaleInput.style.fontFamily = 'monospace';
+    scaleInput.style.fontSize = '14.4px';
+    uiContainer.appendChild(scaleInput);
+
+    const lockButton = document.createElement('button');
+    lockButton.textContent = 'Lock';
+    lockButton.style.padding = '5px 10px';
+    lockButton.style.border = '2px solid rgb(8, 8, 8)';
+    lockButton.style.background = '#222';
+    lockButton.style.color = 'white';
+    lockButton.style.borderRadius = '0px';
+    lockButton.style.cursor = 'pointer';
+    lockButton.style.fontFamily = 'monospace';
+    lockButton.style.fontSize = '14.4px';
+    let isLocked = false;
+    lockButton.addEventListener('click', () => {
+        isLocked = !isLocked;
+        lockButton.textContent = isLocked ? 'Unlock' : 'Lock';
+        overlay.style.pointerEvents = isLocked ? 'none' : 'auto';
+    });
+    uiContainer.appendChild(lockButton);
+
+    const opacityLabel = document.createElement('label');
+    opacityLabel.textContent = 'Opacity:';
+    opacityLabel.style.marginRight = '5px';
+    opacityLabel.style.fontFamily = 'monospace';
+    opacityLabel.style.fontSize = '14.4px';
+    uiContainer.appendChild(opacityLabel);
+
+    const opacitySlider = document.createElement('input');
+    opacitySlider.type = 'range';
+    opacitySlider.min = '0';
+    opacitySlider.max = '100';
+    opacitySlider.step = '25';
+    opacitySlider.value = '100';
+    opacitySlider.style.cursor = 'pointer';
+    uiContainer.appendChild(opacitySlider);
+
+    const opacityInput = document.createElement('input');
+    opacityInput.type = 'number';
+    opacityInput.min = '0';
+    opacityInput.max = '100';
+    opacityInput.value = '100';
+    opacityInput.style.width = 'auto';
+    opacityInput.style.padding = '5px';
+    opacityInput.style.border = 'none';
+    opacityInput.style.background = '#222';
+    opacityInput.style.borderRadius = '0px';
+    opacityInput.style.textAlign = 'center';
+    opacityInput.style.fontFamily = 'monospace';
+    opacityInput.style.fontSize = '14.4px';
+    opacityInput.style.border = '2px solid rgb(8, 8, 8)';
+    opacityInput.style.color = 'white';
+    uiContainer.appendChild(opacityInput);
+
+    const updateOpacity = (value) => {
+        value = Math.min(100, Math.max(0, value));
+        overlay.style.opacity = value / 100;
+        opacitySlider.value = value;
+        opacityInput.value = value;
+    };
+
+    opacitySlider.addEventListener('input', () => {
+        updateOpacity(opacitySlider.value);
+    });
+
+    opacityInput.addEventListener('input', () => {
+        updateOpacity(opacityInput.value);
+    });
+
+    input.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                overlay.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    scaleInput.addEventListener('input', () => {
+        const scale = parseFloat(scaleInput.value);
+        overlay.style.transform = `scale(${scale})`;
+    });
+
+    let dragging = false;
+    let offsetX, offsetY;
+
+    overlay.addEventListener('mousedown', (e) => {
+        if (isLocked) return;
+        dragging = true;
+        offsetX = e.clientX - overlay.offsetLeft;
+        offsetY = e.clientY - overlay.offsetTop;
+        overlay.style.pointerEvents = 'auto';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (dragging) {
+            overlay.style.left = `${e.clientX - offsetX}px`;
+            overlay.style.top = `${e.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        dragging = false;
+        overlay.style.pointerEvents = 'auto';
+    });
+
+    let isInteractingWithSlider = false;
+
+    opacitySlider.addEventListener('mousedown', () => {
+        isInteractingWithSlider = true;
+    });
+
+    opacitySlider.addEventListener('mouseup', () => {
+        isInteractingWithSlider = false;
+    });
+
+    let isDraggingUI = false;
+    let uiOffsetX, uiOffsetY;
+
+    uiContainer.addEventListener('mousedown', (e) => {
+        if (isInteractingWithSlider) return;
+        isDraggingUI = true;
+        uiOffsetX = e.clientX - uiContainer.offsetLeft;
+        uiOffsetY = e.clientY - uiContainer.offsetTop;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDraggingUI) {
+            uiContainer.style.left = `${e.clientX - uiOffsetX}px`;
+            uiContainer.style.top = `${e.clientY - uiOffsetY}px`;
+            uiBackground.style.left = `${e.clientX - uiOffsetX - 6}px`;
+            uiBackground.style.top = `${e.clientY - uiOffsetY - 6}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDraggingUI = false;
+        uiContainer.style.pointerEvents = 'auto';
+    });
+
+    uiContainer.style.display = 'none';
+    uiBackground.style.display = 'none';
+
+    const overlayToggleButton = document.getElementById('overlay');
+    overlayToggleButton.addEventListener('click', () => {
+    const isHidden = uiContainer.style.display === 'none';
+    uiContainer.style.display = isHidden ? 'block' : 'none';
+    uiBackground.style.display = isHidden ? 'block' : 'none';
+    });
 })();
-document.getElementById('copyright').innerHTML = 'PPClient++ 2 1.0.3.1';
+document.getElementById('copyright').innerHTML = 'PPClient++ 2 1.0.4';
 // 0vC4#7152 aka Palette
 
 // This extension may not be sold or be as part of a purchasable bundle, If you have paid for this extension, you should demand your money back immediately.
